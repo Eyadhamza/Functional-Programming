@@ -3,42 +3,38 @@ namespace ConsoleApp1;
 
 internal class Program
 {
-    
+    private static Func<int, (double x1, double x2)> _productParameterFoodDelegate = ProductParameterFood;
+    private static Func<int, (double x1, double x2)> _productParameterBeverageDelegate = ProductParameterBeverage;
+    private static Func<int, (double x1, double x2)> _productParameterRawMaterialDelegate = ProductParameterRawMaterial;
+    private static Order _order = new() {OrderId = 10, ProductIndex = 100, Quantity = 20, UnitPrice = 4};
     static void Main(string[] args)
     {
-        Func<double, double> dlgtTest1 = Test1;
-        Func<double, double> dlgtTest2 = Test2;
-
-        List<Func<double, double>> delegates = new List<Func<double, double>>
-        {
-            dlgtTest1,
-            dlgtTest2
-        };
-        // these are not considered higher order functions.
-        // the function only accepts a double and returns a double.
-        Console.WriteLine(Test2(Test1(5)).ToString());
-        Console.WriteLine(Test1(Test2(5)).ToString());
-
-        // invocation through the delegates
-        Console.WriteLine(delegates[0](5).ToString()); 
-        Console.WriteLine(delegates[1](5).ToString());
+        var product = ProductType.Food;
         
-        // higher order functions
-        Console.WriteLine(Test3(Test1, 5).ToString());
-        Console.WriteLine(Test3(Test2, 5).ToString());
-        Console.ReadLine();
+        Func<int, (double x1, double x2)> productParameterCalc = (product == ProductType.Food) ? _productParameterFoodDelegate : (product == ProductType.Beverage) ? _productParameterBeverageDelegate : _productParameterRawMaterialDelegate;
+        
+        Console.WriteLine(CalculateDiscount(productParameterCalc, _order));
     }
 
-    private static double Test1(double x)
+    private static double CalculateDiscount(Func<int, (double x1, double x2)> productParameterCalc, Order order)
     {
-        return x / 2;
+        (double x1, double x2) parameters = productParameterCalc(order.ProductIndex);
+        
+        return parameters.x1 * order.Quantity + parameters.x2 * order.UnitPrice;
     }
-    private static double Test2(double x)
+    
+    private static (double x1, double x2) ProductParameterFood(int productIndex)
     {
-        return x / 4 + 1;
+        return (x1:productIndex / (double) (productIndex + 100), x2:productIndex / (double) (productIndex + 200));
     }
-    private static double Test3(Func<double, double> func, double value)
+
+    private static (double x1, double x2) ProductParameterBeverage(int productIndex)
     {
-        return func(value) + value;
+        return (x1:productIndex / (double) (productIndex + 200), x2:productIndex / (double) (productIndex + 300));
     }
+    private static (double x1, double x2) ProductParameterRawMaterial(int productIndex)
+    {
+        return (x1:productIndex / (double) (productIndex + 300), x2:productIndex / (double) (productIndex + 400));
+    }
+
 }
