@@ -11,7 +11,13 @@ internal class Program
     {
         var product = ProductType.Food;
         
-        Func<int, (double x1, double x2)> productParameterCalc = (product == ProductType.Food) ? _productParameterFoodDelegate : (product == ProductType.Beverage) ? _productParameterBeverageDelegate : _productParameterRawMaterialDelegate;
+        Func<int, (double x1, double x2)> productParameterCalc = product switch
+        {
+            ProductType.Food => _productParameterFoodDelegate,
+            ProductType.Beverage => _productParameterBeverageDelegate,
+            ProductType.RawMaterial => _productParameterRawMaterialDelegate,
+            _ => throw new ArgumentOutOfRangeException(nameof(product), product, null)
+        };
         
         Console.WriteLine(CalculateDiscount(productParameterCalc, _order));
     }
