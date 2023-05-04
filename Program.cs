@@ -1,32 +1,77 @@
-﻿
-namespace ConsoleApp1;
+﻿namespace ConsoleApp1;
 
 internal class Program
 {
-    private static List<double> _myData = new List<double>() { 7, 4, 5, 6, 3, 8, 10 };
-    
+    private static List<Order> _ordersForProcessing = new();
+
     static void Main(string[] args)
     {
-        _myData
-            .Select(AddOne)
-            .Select(Square)
-            .Select(SubtractTen)
-            .ToList()
-            .ForEach(Console.WriteLine);
+        _ordersForProcessing = new List<Order>()
+        {
+            new(),
+            new(),
+            new(),
+        };
+        var ordersWithDiscounts = _ordersForProcessing
+            .Select(order => GetOrderWithDiscount(order, GetDiscountRules()));
         
-        Console.ReadLine();
+        
     }
 
-    private static double AddOne(double x)
+    private static Order GetOrderWithDiscount(Order order, List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)> rules)
     {
-        return x + 1;
+        var discount = rules
+            .Where((a) => a.QualifyingCondition(order))
+            .Select((b) => b.GetDiscount(order))
+            .OrderBy((x) => x)
+            .Take(3)
+            .Average();
+        
+        // this breaks a rule in FP called "immutability" - the order object is being changed TODO: fix this
+        var neworder = new Order();
+        neworder.Discount = discount;
+        return neworder;
     }
-    private static double Square(double x)
+
+    private static List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)> GetDiscountRules()
     {
-        return x * x;
+        List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)> discountRules
+            = new List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)>
+            {
+                (isTypeOneQualified, ApplyTypeOneDiscount),
+                (isTypeTwoQualified, ApplyTypeTwoDiscount),
+                (isTypeThreeQualified, ApplyTypeThreeDiscount)
+            };
+
+        return discountRules;
     }
-    private static double SubtractTen(double x)
+
+
+    private static bool isTypeOneQualified(Order order)
     {
-        return x - 10;
+        return true;
+    }
+    
+    private static decimal ApplyTypeOneDiscount(Order order)
+    {
+        return 1M;
+    }
+    private static bool isTypeTwoQualified(Order order)
+    {
+        return true;
+    }
+    
+    private static decimal ApplyTypeTwoDiscount(Order order)
+    {
+        return 1M;
+    }
+    private static bool isTypeThreeQualified(Order order)
+    {
+        return true;
+    }
+    
+    private static decimal ApplyTypeThreeDiscount(Order order)
+    {
+        return 1M;
     }
 }
