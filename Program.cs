@@ -3,30 +3,42 @@ namespace ConsoleApp1;
 
 internal class Program
 {
-    private static List<double> _myData = new List<double>() { 7, 4, 5, 6, 3, 8, 10 };
     
     static void Main(string[] args)
     {
-        _myData
-            .Select(AddOne)
-            .Select(Square)
-            .Select(SubtractTen)
-            .ToList()
-            .ForEach(Console.WriteLine);
+        Func<double, double> dlgtTest1 = Test1;
+        Func<double, double> dlgtTest2 = Test2;
+
+        List<Func<double, double>> delegates = new List<Func<double, double>>
+        {
+            dlgtTest1,
+            dlgtTest2
+        };
+        // these are not considered higher order functions.
+        // the function only accepts a double and returns a double.
+        Console.WriteLine(Test2(Test1(5)).ToString());
+        Console.WriteLine(Test1(Test2(5)).ToString());
+
+        // invocation through the delegates
+        Console.WriteLine(delegates[0](5).ToString()); 
+        Console.WriteLine(delegates[1](5).ToString());
         
+        // higher order functions
+        Console.WriteLine(Test3(Test1, 5).ToString());
+        Console.WriteLine(Test3(Test2, 5).ToString());
         Console.ReadLine();
     }
 
-    private static double AddOne(double x)
+    private static double Test1(double x)
     {
-        return x + 1;
+        return x / 2;
     }
-    private static double Square(double x)
+    private static double Test2(double x)
     {
-        return x * x;
+        return x / 4 + 1;
     }
-    private static double SubtractTen(double x)
+    private static double Test3(Func<double, double> func, double value)
     {
-        return x - 10;
+        return func(value) + value;
     }
 }
