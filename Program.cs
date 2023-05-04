@@ -21,9 +21,9 @@ internal class Program
     private static Order GetOrderWithDiscount(Order order, List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)> rules)
     {
         var discount = rules
-            .Where((a) => a.QualifyingCondition(order))
-            .Select((b) => b.GetDiscount(order))
-            .OrderBy((x) => x)
+            .Where(a => a.QualifyingCondition(order))
+            .Select(b => b.GetDiscount(order))
+            .OrderBy(x => x)
             .Take(3)
             .Average();
         
@@ -35,19 +35,19 @@ internal class Program
 
     private static List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)> GetDiscountRules()
     {
-        List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)> discountRules
-            = new List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)>
+        List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)> discountRules = 
+            new List<(Func<Order, bool> QualifyingCondition, Func<Order, decimal> GetDiscount)>
             {
-                (isTypeOneQualified, ApplyTypeOneDiscount),
-                (isTypeTwoQualified, ApplyTypeTwoDiscount),
-                (isTypeThreeQualified, ApplyTypeThreeDiscount)
+                (IsTypeOneQualified, ApplyTypeOneDiscount),
+                (IsTypeTwoQualified, ApplyTypeTwoDiscount),
+                (IsTypeThreeQualified, ApplyTypeThreeDiscount)
             };
 
         return discountRules;
     }
 
 
-    private static bool isTypeOneQualified(Order order)
+    private static bool IsTypeOneQualified(Order order)
     {
         return true;
     }
@@ -56,7 +56,7 @@ internal class Program
     {
         return 1M;
     }
-    private static bool isTypeTwoQualified(Order order)
+    private static bool IsTypeTwoQualified(Order order)
     {
         return true;
     }
@@ -65,7 +65,7 @@ internal class Program
     {
         return 1M;
     }
-    private static bool isTypeThreeQualified(Order order)
+    private static bool IsTypeThreeQualified(Order order)
     {
         return true;
     }
